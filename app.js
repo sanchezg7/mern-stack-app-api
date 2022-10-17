@@ -1,12 +1,8 @@
 import express from "express";
+import user from "./src/auth/user.js";
 
 const app = express();
 
-app.post("/api/register", (req, res) => {
-    res.json({
-        data: "success on register endpoint"
-
-    });
-});
+app.use("/api", user);
 
 export default app;
