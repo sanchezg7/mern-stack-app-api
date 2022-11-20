@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import mongoose from "mongoose";
 import env from "./src/env.js";
-console.log(env);
+
 const app = express();
 app.use(cors({ origin: `${env.CLIENT_URL}` }));
 app.use(bodyParser.json());
