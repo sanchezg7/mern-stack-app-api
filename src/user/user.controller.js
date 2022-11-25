@@ -7,6 +7,7 @@ import env from "../env.js";
 import User from "./user.model.js";
 // import {expressjwt as jwt} from "express-jwt";
 import jwt from "jsonwebtoken";
+import { registerEmailParams } from "./registration.js";
 
 const ses = new SES({
     region: env.AWS_REGION
@@ -30,43 +31,21 @@ controller.post("/register", userValidator, runValidation, (req, res) => {
             expiresIn: "10m" // minutes
         });
 
+   const params = registerEmailParams(email, token);
 
-    const params = {
-        Source: env.EMAIL_FROM,
-        Destination: {
-            ToAddresses: [env.EMAIL_HARDCODE]
-        },
-        Message: {
-            Body: {
-                Html: {
-                    Charset: "UTF-8",
-                    Data: `
-<html>
-    <h1>Verify your email address</h1>
-    <p>Please use the following linnk to complete your registration</p>
-    <p>${env.CLIENT_URL}/auth/activate/${token}</p>
-</html>`
-                }
-            },
-            Subject: {
-                "Charset": "UTF-8",
-                "Data": "Complete your registration"
-            }
-        },
-        ReplyToAddresses: [env.EMAIL_FROM]
-    };
-    sendEmail(params)
+   sendEmail(params)
         .then(data => {
             console.log("Email submitted to SES", data);
             res.json({
-                data: "success on register endpoint"
+                data: `Email has been sent to ${email}, Follow the instructions to complete your registration`
             });
         })
         .catch(err => {
-            console.error(err)
-            res.send("Email send failed");
+            console.error(err);
+            res.json({
+                data: `We could not verify your email. Please try again`
+            });
         });
-
     });
 
 });
