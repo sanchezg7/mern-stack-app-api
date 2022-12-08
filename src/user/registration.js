@@ -14,7 +14,7 @@ const registerEmailParams = (email, token) => {
                     Data: `
 <html>
     <h1>Verify your email address</h1>
-    <p>Please use the following linnk to complete your registration</p>
+    <p>Please use the following link to complete your registration</p>
     <p>${env.CLIENT_URL}/auth/activate/${token}</p>
 </html>`
                 }

@@ -5,7 +5,6 @@ import { runValidation } from "../validate.js";
 import { SES } from "@aws-sdk/client-ses";
 import env from "../env.js";
 import User from "./user.model.js";
-// import {expressjwt as jwt} from "express-jwt";
 import jwt from "jsonwebtoken";
 import { registerEmailParams } from "./registration.js";
 import shortid from "shortid";
@@ -32,6 +31,13 @@ controller.post("/register", userValidator, runValidation, (req, res) => {
             expiresIn: "10m" // minutes
         });
 
+   if(env.DISABLE_EMAILS === "1") {
+        res.json({
+            message: "Registered! Email stubbed.",
+            token: token
+        })
+       return;
+   }
    const params = registerEmailParams(email, token);
 
    sendEmail(params)

@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="run" type="js.build_tools.npm" nameIsGenerated="true">
+  <configuration default="false" name="start" type="js.build_tools.npm" nameIsGenerated="true">
     <package-json value="$PROJECT_DIR$/package.json" />
     <command value="run" />
     <scripts>
       <script value="start" />
     </scripts>
-    <node-interpreter value="project" />
+    <node-interpreter value="wsl://Ubuntu-20.04@/usr/bin/node" />
     <envs />
     <method v="2" />
   </configuration>
