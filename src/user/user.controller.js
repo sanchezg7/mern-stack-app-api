@@ -8,6 +8,7 @@ import User from "./user.model.js";
 // import {expressjwt as jwt} from "express-jwt";
 import jwt from "jsonwebtoken";
 import { registerEmailParams } from "./registration.js";
+import shortid from "shortid";
 
 const ses = new SES({
     region: env.AWS_REGION
@@ -37,17 +38,50 @@ controller.post("/register", userValidator, runValidation, (req, res) => {
         .then(data => {
             console.log("Email submitted to SES", data);
             res.json({
-                data: `Email has been sent to ${email}, Follow the instructions to complete your registration`
+                message: `Email has been sent to ${email}, Follow the instructions to complete your registration`
             });
         })
         .catch(err => {
             console.error(err);
             res.json({
-                data: `We could not verify your email. Please try again`
+                message: `We could not verify your email. Please try again`
             });
         });
     });
 
+});
+
+controller.post("/register/activate", (req, res) => {
+    const { token } = req.body;
+    // verify the token isn't expired
+    jwt.verify(token, env.JWT_ACCOUNT_ACTIVATION, (err, decoded) => {
+        if(err){
+            return res.status(401).json({
+                message: "Expired link. Try again"
+            });
+        }
+
+        const { name, email, password } = jwt.decode(token);
+        const username = shortid.generate();
+
+        User.findOne({email}).exec((err, result) => {
+           if(result){
+               return res.status(401).json({
+                   message: "Email is taken"
+               })
+           }
+
+           // create new user
+           const newUser = new User({username, name, email, password});
+            newUser.save((err1, createdUser) => {
+                if(err){
+                    return res.status(500).json({
+                        message: "Error saving user. Try again later"
+                    });
+                }
+           });
+        });
+    });
 });
 
 export default controller;
