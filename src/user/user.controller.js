@@ -70,8 +70,8 @@ controller.post("/register/activate", (req, res) => {
         const { name, email, password } = jwt.decode(token);
         const username = shortid.generate();
 
-        User.findOne({email}).exec((err, result) => {
-           if(result){
+        User.findOne({email}).exec((err, userSearchResult) => {
+           if(userSearchResult){
                return res.status(401).json({
                    message: "Email is taken"
                })
@@ -85,6 +85,10 @@ controller.post("/register/activate", (req, res) => {
                         message: "Error saving user. Try again later"
                     });
                 }
+
+                return res.status(201).json({
+                    message: "Registration was successful."
+                });
            });
         });
     });

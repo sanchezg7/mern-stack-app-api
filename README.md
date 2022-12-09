@@ -9,3 +9,7 @@ https://allstate.udemy.com/course/mern-react-node-aws/learn/lecture/18082987#ove
 Ensure respective node is specified in wsl when running in wsl
 
 http://localhost:8080/register
+
+# Mongo Commands
+Delete all documents from a collection
+db.users.deleteMany({})
