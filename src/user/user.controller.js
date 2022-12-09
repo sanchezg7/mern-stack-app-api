@@ -1,6 +1,6 @@
 import express from "express";
 const controller = express();
-import { userValidator } from "./user.viewmodel.js";
+import {onUserLoginValidator, userValidator} from "./user.viewmodel.js";
 import { runValidation } from "../validate.js";
 import { SES } from "@aws-sdk/client-ses";
 import env from "../env.js";
@@ -92,6 +92,33 @@ controller.post("/register/activate", (req, res) => {
            });
         });
     });
+});
+
+controller.post("/login", onUserLoginValidator, runValidation, (req, res) => {
+   const { email, password } = req.body;
+
+   User.findOne({email}).exec((err, user) => {
+      if(err || !user) {
+          return res.status(404).json({
+              message: "Unable to authenticate."
+          });
+      }
+      if(!user.authenticate(password)) {
+          return res.status(404).json({
+              message: "Unable to authenticate."
+          });
+      }
+      // generate token and send to client
+       const token = jwt.sign({ _id: user._id }, env.JWT_SECRET, {
+           expiresIn: "7d"
+       });
+      const {_id, name, email, hashed_password} = user;
+
+      return res.json({
+        token,
+        user:  {_id, name, email, hashed_password}
+      });
+   });
 });
 
 export default controller;
