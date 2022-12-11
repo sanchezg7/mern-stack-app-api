@@ -8,6 +8,7 @@ import User from "./user.model.js";
 import jwt from "jsonwebtoken";
 import { registerEmailParams } from "./registration.js";
 import shortid from "shortid";
+import {requireSignIn} from "./authentication.js";
 
 const ses = new SES({
     region: env.AWS_REGION
@@ -28,7 +29,8 @@ controller.post("/register", userValidator, runValidation, (req, res) => {
        }
        // generate token with username email and password
         token = jwt.sign({ name, email, password }, env.JWT_ACCOUNT_ACTIVATION, {
-            expiresIn: "10m" // minutes
+            expiresIn: "10m", // minutes,
+            algorithm: "HS256"
         });
 
    if(env.DISABLE_EMAILS === "1") {
@@ -110,7 +112,8 @@ controller.post("/login", onUserLoginValidator, runValidation, (req, res) => {
       }
       // generate token and send to client
        const token = jwt.sign({ _id: user._id }, env.JWT_SECRET, {
-           expiresIn: "7d"
+           expiresIn: "7d",
+           algorithm: "HS256"
        });
       const {_id, name, email, hashed_password, role } = user;
 
@@ -118,6 +121,12 @@ controller.post("/login", onUserLoginValidator, runValidation, (req, res) => {
         token,
         user:  {_id, name, email, hashed_password, role }
       });
+   });
+});
+
+controller.get("/secret", requireSignIn, (req, res) => {
+   res.json({
+      data: "This is the secret page for logged in users only"
    });
 });
 
