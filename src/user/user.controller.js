@@ -124,10 +124,11 @@ controller.post("/login", onUserLoginValidator, runValidation, (req, res) => {
    });
 });
 
-controller.get("/secret", requireSignIn, (req, res) => {
-   res.json({
-      data: "This is the secret page for logged in users only"
-   });
-});
+// kepted only for example
+// controller.get("/secret", requireSignIn, (req, res) => {
+//    res.json({
+//       data: "This is the secret page for logged in users only"
+//    });
+// });
 
 export default controller;
