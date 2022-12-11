@@ -112,11 +112,11 @@ controller.post("/login", onUserLoginValidator, runValidation, (req, res) => {
        const token = jwt.sign({ _id: user._id }, env.JWT_SECRET, {
            expiresIn: "7d"
        });
-      const {_id, name, email, hashed_password} = user;
+      const {_id, name, email, hashed_password, role } = user;
 
       return res.json({
         token,
-        user:  {_id, name, email, hashed_password}
+        user:  {_id, name, email, hashed_password, role }
       });
    });
 });
