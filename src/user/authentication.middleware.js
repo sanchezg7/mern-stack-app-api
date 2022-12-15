@@ -33,6 +33,9 @@ export const adminMiddleware = (req, res, next) => {
             message: "Unauthorized."
         });
      }
+      // enrich the request with user info to access downstream
+      req.user = user;
+     next();
   });
 };
 
