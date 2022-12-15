@@ -1,10 +1,11 @@
 import {expressjwt} from "express-jwt";
 import env from "../env.js";
+import User from "./user.model.js";
 
 export const requireSignIn = expressjwt({ secret: env.JWT_SECRET, algorithms: ["HS256"] });
 
-export const enrichWithUserInfo = (req, res, next) => {
-  const authUserId = req.user._id;
+export const enrichContextWithUser = (req, res, next) => {
+  const authUserId = req.auth._id;
   User.findOne({
       "_id": authUserId
   }).exec((err, user) => {
@@ -20,7 +21,7 @@ export const enrichWithUserInfo = (req, res, next) => {
 };
 
 export const adminMiddleware = (req, res, next) => {
-  const adminUserId = req.user._id;
+  const adminUserId = req.auth._id;
   User.findOne({_id: adminUserId }).exec((err, user) => {
      if(err || !user){
          return res.status(400).json({

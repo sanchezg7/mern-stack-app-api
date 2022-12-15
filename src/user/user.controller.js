@@ -8,7 +8,7 @@ import User from "./user.model.js";
 import jwt from "jsonwebtoken";
 import { registerEmailParams } from "./registration.js";
 import shortid from "shortid";
-import {requireSignIn} from "./authentication.js";
+import {enrichContextWithUser, requireSignIn} from "./authentication.middleware.js";
 
 const ses = new SES({
     region: env.AWS_REGION
@@ -115,13 +115,21 @@ controller.post("/login", onUserLoginValidator, runValidation, (req, res) => {
            expiresIn: "7d",
            algorithm: "HS256"
        });
-      const {_id, name, email, hashed_password, role } = user;
+      const {_id, name, email, role } = user;
 
       return res.json({
         token,
-        user:  {_id, name, email, hashed_password, role }
+        user:  {_id, name, email, role }
       });
    });
+});
+
+controller.get("/user", requireSignIn, enrichContextWithUser, (req, res) => {
+    req.user.hashed_password = undefined;
+    req.user.salt = undefined;
+    const {_id, name, email, role } = req.user;
+    const user =  {_id, name, email, role }
+    return res.json(user);
 });
 
 // kepted only for example
