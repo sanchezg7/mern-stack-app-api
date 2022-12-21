@@ -1,6 +1,6 @@
 import express from "express";
 const controller = express();
-import {onUserLoginValidator, userValidator} from "./user.viewmodel.js";
+import {onUserLoginValidator, userValidator} from "./user.vm.validator.js";
 import { runValidation } from "../validate.js";
 import { SES } from "@aws-sdk/client-ses";
 import env from "../env.js";
