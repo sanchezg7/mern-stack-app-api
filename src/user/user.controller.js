@@ -187,9 +187,47 @@ controller.post("/forgot-password", forgotPasswordValidator, runValidation, (req
     // populate the reset password link in the db for that user
 });
 
-controller.post("/reset-password", resetPasswordValidator, runValidation, (req, res) => {});
+controller.put("/password", resetPasswordValidator, runValidation, (req, res) => {
+    const { resetPasswordLink, newPassword } = req.body;
+    if(resetPasswordLink) {
+        // check for expiry
+        jwt.verify(resetPasswordLink, env.JWT_RESET_PASSWORD, (jwtErr) => {
+            if(jwtErr) {
+                return res.status(400).json({
+                    message: "Expired link. Try again."
+                });
+            }
+            User.findOne( { resetPasswordLink }).exec((err, user) => {
+              if(err || !user) {
+                  return res.status(400).json({
+                      message: "Invalid token. Try again"
+                  });
+              }
+              const updatedFields = {
+                password: newPassword,
+                resetPasswordLink: ""
+              };
 
-// kepted only for example
+                user.password = newPassword;
+                user.resetPasswordLink = "";
+                // calls update-one under the hood
+                user.save((err, result) => {
+                    if(err) {
+                        return res.status(400).json({
+                           message: "Password reset failed. Try again."
+                        });
+                    }
+
+                    return res.json({
+                        message: "Password reset."
+                    });
+                });
+            });
+        });
+    }
+});
+
+// kept only for example
 // controller.get("/secret", requireSignIn, (req, res) => {
 //    res.json({
 //       data: "This is the secret page for logged in users only"
