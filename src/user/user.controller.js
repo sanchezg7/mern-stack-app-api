@@ -182,9 +182,6 @@ controller.post("/forgot-password", forgotPasswordValidator, runValidation, (req
                });
        });
     });
-
-    // if found, gen token and email to that email.
-    // populate the reset password link in the db for that user
 });
 
 controller.put("/password", resetPasswordValidator, runValidation, (req, res) => {
@@ -203,10 +200,6 @@ controller.put("/password", resetPasswordValidator, runValidation, (req, res) =>
                       message: "Invalid token. Try again"
                   });
               }
-              const updatedFields = {
-                password: newPassword,
-                resetPasswordLink: ""
-              };
 
                 user.password = newPassword;
                 user.resetPasswordLink = "";
