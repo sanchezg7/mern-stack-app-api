@@ -1,6 +1,6 @@
 import express from "express";
 const controller = express();
-import {onUserLoginValidator, userValidator} from "./user.vm.validator.js";
+import {forgotPasswordValidator, onUserLoginValidator, userValidator, resetPasswordValidator} from "./user.vm.validator.js";
 import { runValidation } from "../validate.js";
 import { SES } from "@aws-sdk/client-ses";
 import env from "../env.js";
@@ -9,13 +9,17 @@ import jwt from "jsonwebtoken";
 import { registerEmailParams } from "./registration.js";
 import shortid from "shortid";
 import {adminMiddleware, enrichContextWithUser, requireSignIn} from "./authentication.middleware.js";
+import {forgotPasswordEmailParams} from "./password.js";
 
 const ses = new SES({
     region: env.AWS_REGION
 });
 
 const sendEmail = (sendEmailCommandInput) => {
-  return ses.sendEmail(sendEmailCommandInput);
+    if(env.DISABLE_EMAILS === "1") {
+        return Promise.resolve({"message": "EMAILS DISABLED"});
+    }
+    return ses.sendEmail(sendEmailCommandInput);
 };
 
 controller.post("/register", userValidator, runValidation, (req, res) => {
@@ -135,6 +139,55 @@ controller.get("/admin", requireSignIn, adminMiddleware, (req, res) => {
     const user =  {_id, name, email, role }
     return res.json(user);
 });
+
+controller.post("/forgot-password", forgotPasswordValidator, runValidation, (req, res) => {
+    // query db to find if email exists.
+    const { email } = req.body;
+    User.findOne({ email }).exec((err, user) => {
+        const defaultMessage = `Email sent to ${email}, click on link to reset password.`;
+        const errorMessage = "Password reset failed. Try again later.";
+       if(err || !user) {
+           return res.status(200).json({
+               message: defaultMessage
+           });
+       }
+
+       const token = jwt.sign({name: user.name}, env.JWT_RESET_PASSWORD, {
+          expiresIn: "10m"
+       });
+
+       const emailParams = forgotPasswordEmailParams(email, token);
+
+       return user.updateOne({
+           resetPasswordLink: token
+       }, null, (err, success) => {
+           if(err) {
+               return res.status(500).json({
+                   message: errorMessage
+               });
+           }
+
+           sendEmail(emailParams)
+               .then(data => {
+                   console.log("Reset password Email submitted to SES", data, token);
+                   res.json({
+                       message: defaultMessage
+                   });
+               })
+               .catch(err => {
+                   console.error(err);
+                   res.status(500).json({
+                       message: "Password reset failed. Try again later."
+                   });
+               });
+       });
+    });
+
+    // if found, gen token and email to that email.
+    // populate the reset password link in the db for that user
+});
+
+controller.post("/reset-password", resetPasswordValidator, runValidation, (req, res) => {});
 
 // kepted only for example
 // controller.get("/secret", requireSignIn, (req, res) => {

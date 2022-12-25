@@ -28,7 +28,7 @@ const forgotPasswordValidator = [
       .withMessage("Must be a valid email address")
 ];
 
-const userRegisterValidator = [
+const resetPasswordValidator = [
   check("newPassword")
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters long"),
@@ -38,4 +38,4 @@ const userRegisterValidator = [
         .withMessage("Token is required")
 ];
 
-export { userValidator, onUserLoginValidator, forgotPasswordValidator };
+export { userValidator, onUserLoginValidator, forgotPasswordValidator, resetPasswordValidator };
