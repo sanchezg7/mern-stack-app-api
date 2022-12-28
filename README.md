@@ -13,3 +13,5 @@ http://localhost:8080/register
 # Mongo Commands
 Delete all documents from a collection
 db.users.deleteMany({})
+
+# AWS Support
