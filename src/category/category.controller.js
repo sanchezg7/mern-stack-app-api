@@ -9,6 +9,7 @@ import formidable from "formidable";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import env from "../env.js";
 import { v4 as uuidv4 } from 'uuid';
+import fs from "fs";
 
 const s3 = new S3Client({
     region: env.AWS_REGION
@@ -44,7 +45,7 @@ controller.post("/", /*categoryCreateValidator, runValidation,*/ requireSignIn, 
         const params = {
             "Bucket": "mern-stack-g-123",
             "Key": `${CATEGORY_DIRECTORY}/${key}`,
-            "Body": image.path,
+            "Body": fs.readFileSync(image.filepath),
             "ContentType": "image/jpg",
         };
 
