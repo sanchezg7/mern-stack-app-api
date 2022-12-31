@@ -86,6 +86,16 @@ controller.post("/", /*categoryCreateValidator, runValidation,*/ requireSignIn, 
 
 // list
 controller.get("/", (req, res) => {
+    // TODO: pagination
+    CategoryModel.find({}).exec((err, data) => {
+       if(err){
+           return res.status(500).json({
+               message: "Unable to fetch categories"
+           });
+       }
+
+       return res.status(200).json(data);
+    });
 
 });
 
