@@ -20,8 +20,7 @@ Create respective group
 Add group to role
 Add users to group
 
-Create a s3 bucket with the default settings
-Can also add a bucket policy for the admin user to put objects into the respective bucket
+Allow public read access to objects in bucket
 ```
 {
     "Version": "2012-10-17",
@@ -30,20 +29,13 @@ Can also add a bucket policy for the admin user to put objects into the respecti
             "Sid": "AddCannedAcl",
             "Effect": "Allow",
             "Principal": {
-                "AWS": "arn:aws:iam::############:user/admin"
+                "AWS": "*"
             },
-            "Action": [
-                "s3:PutObject",
-                "s3:PutObjectAcl"
-            ],
-            "Resource": "arn:aws:s3:::bucket-name-here/*",
-            "Condition": {
-                "StringEquals": {
-                    "s3:x-amz-acl": "public-read"
-                }
-            }
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::BUCKET_NAME/*"
         }
     ]
+}
 ```
 Add respective CORS configuration in JSON format
 ```json
