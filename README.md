@@ -59,3 +59,6 @@ Add respective CORS configuration in JSON format
 ```
 
 No need for inline policy, since the user was added to the group. The group assigned to the role.
+
+# ElasticbeakStalk Support
+Compile project into javascript and place into a zip file.

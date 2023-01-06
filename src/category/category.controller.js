@@ -77,6 +77,7 @@ const s3 = new S3Client({
 //     });
 
 const CATEGORY_DIRECTORY = "category";
+const BUCKET_NAME_REFACTOR_ME_TO_ENV = "mern-stack-g-123";
 const genKey = type => `${uuidv4()}.${type}`;
 controller.post("/", categoryCreateValidator, runValidation, requireSignIn, enrichContextWithUser, async (req, res) => {
     const { name, image, content } = req.body;
@@ -95,7 +96,6 @@ controller.post("/", categoryCreateValidator, runValidation, requireSignIn, enri
         "ContentEncoding": "base64"
     };
 
-    const BUCKET_NAME_REFACTOR_ME_TO_ENV = "mern-stack-g-123";
     const putObjCmd = new PutObjectCommand(s3PutObjectCmdParams);
     s3.send(putObjCmd).then((data) => {
         // there is limited metadata provided by the output of the command
