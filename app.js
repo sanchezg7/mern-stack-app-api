@@ -16,7 +16,9 @@ app.use(bodyParser.json({
 app.options('*', cors()); // preflight request for all routes
 
 app.use(morgan(':method :url :response-time seconds'));
-
+app.get("/", (req, res) => {
+   return res.status(200).json({message: "Service is up."});
+});
 app.use("/api", user);
 app.use("/api/category", category);
 
