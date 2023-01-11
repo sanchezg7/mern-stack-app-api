@@ -1,7 +1,10 @@
 import dotenv from "dotenv";
 
-const env = dotenv.config();
+// inject into process.env
+dotenv.config();
 
 const PORT= process.env.PORT || 8080;
 
-export default { ...env.parsed, PORT };
+const resolved = { ...process.env, PORT };
+
+export default resolved;
